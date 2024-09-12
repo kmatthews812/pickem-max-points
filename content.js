@@ -1,20 +1,20 @@
-function calculateTotalPossiblePoints(row) {
-  const totalCells = row.querySelectorAll('td').length;
-  const numberOfGames = totalCells - 3; // Subtract 3 for non-game cells
-
-  let totalPoints = 0;
-  for (let i = 0; i < numberOfGames; i++) {
-    if (i < 16) {
-      totalPoints += 16 - i;
-    } else {
-      totalPoints += 1;
-    }
-  }
-  
-  return totalPoints;
+function calculateNumberOfGames(row) {
+  return row.querySelectorAll('td').length - 3; // Subtract 3 for non-game cells
 }
 
-function calculateMaxPoints(row, totalPossiblePoints) {
+function calculateTotalPossiblePoints(numberOfGames) {
+  totalPossiblePoints = 0;
+  for (let i = 0; i < numberOfGames; i++) {
+    if (i < 16) {
+      totalPossiblePoints += 16 - i;
+    } else {
+      totalPossiblePoints += 1;
+    }
+  }
+  return totalPossiblePoints;
+}
+
+function calculateMaxPoints(row, totalPossiblePoints, numberOfGames) {
   const picks = row.querySelectorAll('td:nth-child(n+4)');
   
   // To calculate max points, subtract known losses from total possible points
@@ -22,11 +22,12 @@ function calculateMaxPoints(row, totalPossiblePoints) {
   let skippedPickCount = 0;
 
   picks.forEach(pick => {
-    // If a cell has a single span with "-" it's a skipped pick and known loss for 1, then 2, 3, etc.
+    // If a cell has a single span with "-" it's a skipped pick and known loss for 1, then 2, 3, etc
+    // on a normal week with 16 games, and 2, 3, ..etc on a bye week with 15 games.
     const spans = pick.querySelectorAll('span');
     if (spans.length === 1 && spans[0].textContent.trim() === '-') {
       skippedPickCount++;
-      maxPoints -= skippedPickCount;
+      maxPoints -= 16 - numberOfGames + skippedPickCount;
     } else {
       // If a cell has a svg with a class of MuiSvgIcon-colorError it's a known loss for the parsed amount
       const svg = pick.querySelector('svg');
@@ -71,11 +72,12 @@ function addMaxPointsColumn() {
   
   // Add data to each row
   const rows = table.querySelectorAll('tbody tr');
-  const totalPossiblePoints = calculateTotalPossiblePoints(rows[0]);
+  const numberOfGames = calculateNumberOfGames(rows[0]);
+  const totalPossiblePoints = calculateTotalPossiblePoints(numberOfGames);
   rows.forEach(row => {
     const cells = row.querySelectorAll('td');
     const ytdCell = cells[2]; // The 3rd cell (index 2)
-    const maxPoints = calculateMaxPoints(row, totalPossiblePoints);
+    const maxPoints = calculateMaxPoints(row, totalPossiblePoints, numberOfGames);
     const maxPointsCell = ytdCell.cloneNode(true); // Clone with children
     maxPointsCell.textContent = maxPoints;
     maxPointsCell.classList.add('max-points'); // Add the max-points class
