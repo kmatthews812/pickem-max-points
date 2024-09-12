@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Add Max Points to CBS Sports Pickem",
+  "version": "1.0",
+  "description": "Adds a Max Points column to CBS Sports Pickem weekly standings",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://picks.cbssports.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://picks.cbssports.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
